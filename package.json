@@ -1,0 +1,23 @@
+{
+  "name": "node-backend",
+  "version": "0.1.0",
+  "description": "Project generator: Express + TypeScript backend scaffold",
+  "bin": {
+    "node-backend": "index.js"
+  },
+  "files": [
+    "template"
+  ],
+  "scripts": {
+    "test": "node ./test/run-test.js"
+  },
+  "keywords": [
+    "create",
+    "generator",
+    "express",
+    "typescript",
+    "scaffold"
+  ],
+  "author": "Your Name <you@example.com>",
+  "license": "MIT"
+}
