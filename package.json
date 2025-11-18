@@ -1,6 +1,6 @@
 {
   "name": "node-backend",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Project generator: Express + TypeScript backend scaffold",
   "bin": {
     "node-backend": "index.js"
