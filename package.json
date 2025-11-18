@@ -1,5 +1,5 @@
 {
-  "name": "node-backend",
+  "name": "@rush18/node-backend",
   "version": "0.1.1",
   "description": "Project generator: Express + TypeScript backend scaffold",
   "bin": {
@@ -19,5 +19,8 @@
     "scaffold"
   ],
   "author": "Your Name <you@example.com>",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "inquirer": "^13.0.1"
+  }
 }
