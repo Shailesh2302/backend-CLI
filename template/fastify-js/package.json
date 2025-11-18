@@ -1,0 +1,16 @@
+{
+  "name": "__PROJECT_NAME__",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "nodemon src/server.js",
+    "start": "node src/server.js"
+  },
+  "dependencies": {
+    "fastify": "^4.25.2",
+    "fastify-plugin": "^5.0.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2"
+  }
+}

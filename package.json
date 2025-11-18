@@ -21,6 +21,8 @@
   "author": "Your Name <you@example.com>",
   "license": "MIT",
   "dependencies": {
+    "chalk": "^4.1.2",
+    "figlet": "^1.9.4",
     "inquirer": "^8.2.4"
   }
 }
