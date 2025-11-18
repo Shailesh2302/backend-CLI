@@ -1,4 +1,4 @@
-#!/usr/bin/env node
+
 
 const figlet = require("figlet");
 const chalk = require("chalk");
@@ -66,6 +66,7 @@ function exitWith(msg, code = 1) {
     exitWith(`Error: "${projectName}" already exists at ${target}`);
   }
 
+
   if (framework === "NestJS") {
     console.log("Installing NestJS CLI...");
     spawnSync("npm", ["install", "-g", "@nestjs/cli"], { stdio: "inherit" });
@@ -74,92 +75,30 @@ function exitWith(msg, code = 1) {
     spawnSync("nest", ["new", projectName, "--skip-git"], { stdio: "inherit" });
 
     const nestProjectPath = target;
-    const mainFile = path.join(nestProjectPath, "src/main.ts");
-    let mainContent = fs.readFileSync(mainFile, "utf8");
 
-    mainContent = mainContent.replace(
-      'await app.listen(3000);',
-      `
-console.log("Framework: NestJS");
-console.log("Language: TypeScript");
-console.log("Database: ${database}");
-await app.listen(3000);
-      `
-    );
-
-    fs.writeFileSync(mainFile, mainContent, "utf8");
 
     if (database === "PostgreSQL (Prisma)") {
-      console.log("Adding Prisma to NestJS...");
+      console.log("Installing Prisma...");
       spawnSync("npm", ["install", "prisma", "@prisma/client"], {
         cwd: nestProjectPath,
         stdio: "inherit"
       });
+
+      console.log("Initializing Prisma...");
       spawnSync("npx", ["prisma", "init"], {
         cwd: nestProjectPath,
         stdio: "inherit"
       });
     }
 
+
     if (database === "MongoDB (Mongoose)") {
-      console.log("Adding Mongoose to NestJS...");
       spawnSync("npm", ["install", "@nestjs/mongoose", "mongoose"], {
         cwd: nestProjectPath,
         stdio: "inherit"
       });
     }
 
-    if (extras.includes("Prettier + ESLint")) {
-      spawnSync(
-        "npm",
-        [
-          "install",
-          "-D",
-          "eslint",
-          "prettier",
-          "eslint-config-prettier",
-          "eslint-plugin-prettier"
-        ],
-        { cwd: nestProjectPath, stdio: "inherit" }
-      );
-
-      fs.writeFileSync(
-        path.join(nestProjectPath, ".prettierrc"),
-        `
-{
-  "singleQuote": true,
-  "semi": true,
-  "tabWidth": 2
-}
-`.trim()
-      );
-
-      fs.writeFileSync(
-        path.join(nestProjectPath, ".eslintignore"),
-        `
-node_modules
-dist
-`.trim()
-      );
-
-      fs.writeFileSync(
-        path.join(nestProjectPath, ".eslintrc.json"),
-        `
-{
-  "env": {
-    "node": true,
-    "es2021": true
-  },
-  "extends": ["eslint:recommended", "plugin:prettier/recommended"],
-  "parserOptions": {
-    "ecmaVersion": 2022,
-    "sourceType": "module"
-  },
-  "rules": {}
-}
-`.trim()
-      );
-    }
 
     if (extras.includes("Docker Support")) {
       fs.writeFileSync(
@@ -195,7 +134,7 @@ services:
       );
     }
 
-    console.log(`\nProject "${projectName}" created successfully!`);
+    console.log("\nProject created successfully!");
     console.log(`
 Next steps:
   cd ${projectName}
@@ -229,6 +168,20 @@ Next steps:
   copyRecursive(templateDir, target);
   console.log(`Project "${projectName}" created at ${target}`);
 
+
+  console.log("Running npm install...");
+  spawnSync("npm", ["install"], { cwd: target, stdio: "inherit" });
+
+
+  if (framework === "Fastify") {
+    spawnSync("npm", ["install", "fastify"], { cwd: target, stdio: "inherit" });
+  }
+
+  if (framework === "Hono") {
+    spawnSync("npm", ["install", "hono"], { cwd: target, stdio: "inherit" });
+  }
+
+
   if (database === "PostgreSQL (Prisma)") {
     spawnSync("npm", ["install", "prisma", "@prisma/client"], {
       cwd: target,
@@ -247,19 +200,6 @@ Next steps:
     });
   }
 
-  if (framework === "Fastify") {
-    spawnSync("npm", ["install", "fastify"], {
-      cwd: target,
-      stdio: "inherit"
-    });
-  }
-
-  if (framework === "Hono") {
-    spawnSync("npm", ["install", "hono"], {
-      cwd: target,
-      stdio: "inherit"
-    });
-  }
 
   if (extras.includes("Docker Support")) {
     fs.writeFileSync(
@@ -347,20 +287,14 @@ dist
     );
   }
 
-  console.log(`Selected Language: ${language}`);
-  console.log(`Selected Database: ${database}`);
 
   console.log(`
+Selected Language: ${language}
+Selected Framework: ${framework}
+Selected Database: ${database}
+
 Next steps:
   cd ${projectName}
-  npm install
   npm run dev
 `);
-
-  if (autoInstall) {
-    spawnSync("npm", ["install"], {
-      cwd: target,
-      stdio: "inherit"
-    });
-  }
 })();
