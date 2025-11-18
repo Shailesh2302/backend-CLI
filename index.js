@@ -11,7 +11,7 @@ console.log(
   chalk.cyan(
     figlet.textSync("Node Backend CLI", {
       horizontalLayout: "default",
-      verticalLayout: "default",
+      verticalLayout: "default"
     })
   )
 );
@@ -22,26 +22,26 @@ async function askQuestions() {
       type: "list",
       name: "language",
       message: "Choose language:",
-      choices: ["TypeScript", "JavaScript"],
+      choices: ["TypeScript", "JavaScript"]
     },
     {
       type: "list",
       name: "framework",
       message: "Choose framework:",
-      choices: ["Express", "Fastify", "Hono", "NestJS"],
+      choices: ["Express", "Fastify", "Hono", "NestJS"]
     },
     {
       type: "list",
       name: "database",
       message: "Choose database:",
-      choices: ["PostgreSQL (Prisma)", "MongoDB (Mongoose)", "None"],
+      choices: ["PostgreSQL (Prisma)", "MongoDB (Mongoose)", "None"]
     },
     {
       type: "checkbox",
       name: "extras",
       message: "Add extra features:",
-      choices: ["Docker Support", "Prettier + ESLint"],
-    },
+      choices: ["Docker Support", "Prettier + ESLint"]
+    }
   ]);
 }
 
@@ -73,29 +73,53 @@ function exitWith(msg, code = 1) {
     console.log("Creating NestJS project...");
     spawnSync("nest", ["new", projectName, "--skip-git"], { stdio: "inherit" });
 
-    const nestProject = target;
+    const nestProjectPath = target;
 
     if (database === "PostgreSQL (Prisma)") {
       spawnSync("npm", ["install", "prisma", "@prisma/client"], {
-        cwd: nestProject,
-        stdio: "inherit",
+        cwd: nestProjectPath,
+        stdio: "inherit"
       });
-      spawnSync("npx", ["prisma", "init"], {
-        cwd: nestProject,
-        stdio: "inherit",
-      });
+
+      const prismaDir = path.join(nestProjectPath, "prisma");
+      if (!fs.existsSync(prismaDir)) fs.mkdirSync(prismaDir);
+
+      fs.writeFileSync(
+        path.join(prismaDir, "schema.prisma"),
+        `
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id     Int    @id @default(autoincrement())
+  email  String @unique
+  name   String?
+}
+`.trim()
+      );
+
+      fs.writeFileSync(
+        path.join(nestProjectPath, ".env"),
+        `DATABASE_URL="postgresql://user:password@localhost:5432/mydb"`
+      );
     }
 
     if (database === "MongoDB (Mongoose)") {
       spawnSync("npm", ["install", "@nestjs/mongoose", "mongoose"], {
-        cwd: nestProject,
-        stdio: "inherit",
+        cwd: nestProjectPath,
+        stdio: "inherit"
       });
     }
 
     if (extras.includes("Docker Support")) {
       fs.writeFileSync(
-        path.join(nestProject, "Dockerfile"),
+        path.join(nestProjectPath, "Dockerfile"),
         `
 FROM node:20
 WORKDIR /app
@@ -108,7 +132,7 @@ CMD ["npm", "run", "start:dev"]
       );
 
       fs.writeFileSync(
-        path.join(nestProject, "docker-compose.yml"),
+        path.join(nestProjectPath, "docker-compose.yml"),
         `
 version: "3.8"
 services:
@@ -181,13 +205,11 @@ Next steps:
   }
 
   if (database === "PostgreSQL (Prisma)") {
-    spawnSync("npx", ["prisma", "init"], {
-      cwd: target,
-      stdio: "inherit",
-    });
+    const prismaDir = path.join(target, "prisma");
+    if (!fs.existsSync(prismaDir)) fs.mkdirSync(prismaDir);
 
     fs.writeFileSync(
-      path.join(target, "prisma/schema.prisma"),
+      path.join(prismaDir, "schema.prisma"),
       `
 generator client {
   provider = "prisma-client-js"
@@ -205,12 +227,17 @@ model User {
 }
 `.trim()
     );
+
+    fs.writeFileSync(
+      path.join(target, ".env"),
+      `DATABASE_URL="postgresql://user:password@localhost:5432/mydb"`
+    );
   }
 
   if (database === "MongoDB (Mongoose)") {
     spawnSync("npm", ["install", "mongoose"], {
       cwd: target,
-      stdio: "inherit",
+      stdio: "inherit"
     });
   }
 
@@ -254,7 +281,7 @@ services:
         "eslint",
         "prettier",
         "eslint-config-prettier",
-        "eslint-plugin-prettier",
+        "eslint-plugin-prettier"
       ],
       { cwd: target, stdio: "inherit" }
     );
