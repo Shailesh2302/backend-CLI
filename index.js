@@ -1,4 +1,5 @@
 
+
 const figlet = require("figlet");
 const chalk = require("chalk");
 const inquirer = require("inquirer");
@@ -10,7 +11,7 @@ console.log(
   chalk.cyan(
     figlet.textSync("Node Backend CLI", {
       horizontalLayout: "default",
-      verticalLayout: "default",
+      verticalLayout: "default"
     })
   )
 );
@@ -21,40 +22,32 @@ async function askQuestions() {
       type: "list",
       name: "language",
       message: "Choose language:",
-      choices: ["TypeScript", "JavaScript"],
+      choices: ["TypeScript", "JavaScript"]
     },
     {
       type: "list",
       name: "framework",
       message: "Choose framework:",
-      choices: ["Express", "Fastify", "Hono", "NestJS"],
+      choices: ["Express", "Fastify", "Hono", "NestJS"]
     },
     {
       type: "list",
       name: "database",
       message: "Choose database:",
-      choices: ["PostgreSQL (Prisma)", "MongoDB (Mongoose)", "None"],
+      choices: ["PostgreSQL (Prisma)", "MongoDB (Mongoose)", "None"]
     },
     {
       type: "checkbox",
       name: "extras",
       message: "Add extra features:",
-      choices: ["Docker Support", "Prettier + ESLint"],
-    },
+      choices: ["Docker Support", "Prettier + ESLint"]
+    }
   ]);
 }
 
 function exitWith(msg, code = 1) {
   console.error(msg);
   process.exit(code);
-}
-
-function run(command, args, cwd) {
-  const result = spawnSync(command, args, { cwd, stdio: "inherit" });
-  if (result.status !== 0) {
-    console.error(`Error running: ${command} ${args.join(" ")}`);
-    process.exit(result.status);
-  }
 }
 
 (async () => {
@@ -73,63 +66,61 @@ function run(command, args, cwd) {
     exitWith(`Error: "${projectName}" already exists at ${target}`);
   }
 
+
   if (framework === "NestJS") {
-    run("npm", ["install", "-g", "@nestjs/cli"]);
+    console.log("Installing NestJS CLI...");
+    spawnSync("npm", ["install", "-g", "@nestjs/cli"], { stdio: "inherit" });
 
-    run("nest", ["new", projectName, "--skip-git"]);
+    console.log("Creating NestJS project...");
+    spawnSync("nest", ["new", projectName, "--skip-git"], { stdio: "inherit" });
 
-    const nestPath = target;
+    const nestProjectPath = target;
+
 
     if (database === "PostgreSQL (Prisma)") {
-      run("npm", ["install", "prisma", "@prisma/client"], nestPath);
-      run("npx", ["prisma", "init"], nestPath);
+      console.log("Installing Prisma...");
+      spawnSync("npm", ["install", "prisma", "@prisma/client"], {
+        cwd: nestProjectPath,
+        stdio: "inherit"
+      });
 
-      const configPath = path.join(nestPath, "prisma", "prisma.config.ts");
-      if (fs.existsSync(configPath)) fs.unlinkSync(configPath);
-
-      fs.writeFileSync(
-        path.join(nestPath, "prisma", "schema.prisma"),
-        `
-datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
-}
-
-generator client {
-  provider = "prisma-client-js"
-}
-
-model User {
-  id    Int    @id @default(autoincrement())
-  email String @unique
-  name  String?
-}
-`.trim()
-      );
+      console.log("Initializing Prisma...");
+      spawnSync("npx", ["prisma", "init"], {
+        cwd: nestProjectPath,
+        stdio: "inherit"
+      });
     }
+
 
     if (database === "MongoDB (Mongoose)") {
-      run("npm", ["install", "@nestjs/mongoose", "mongoose"], nestPath);
+      spawnSync("npm", ["install", "@nestjs/mongoose", "mongoose"], {
+        cwd: nestProjectPath,
+        stdio: "inherit"
+      });
     }
+
 
     if (extras.includes("Docker Support")) {
       fs.writeFileSync(
-        path.join(nestPath, "Dockerfile"),
+        path.join(nestProjectPath, "Dockerfile"),
         `
 FROM node:20
+
 WORKDIR /app
 COPY package*.json ./
 RUN npm install
 COPY . .
+
 EXPOSE 3000
 CMD ["npm", "run", "start:dev"]
 `.trim()
       );
 
       fs.writeFileSync(
-        path.join(nestPath, "docker-compose.yml"),
+        path.join(nestProjectPath, "docker-compose.yml"),
         `
 version: "3.8"
+
 services:
   app:
     build: .
@@ -143,8 +134,8 @@ services:
       );
     }
 
+    console.log("\nProject created successfully!");
     console.log(`
-✔ Project "${projectName}" created successfully!
 Next steps:
   cd ${projectName}
   npm run start:dev
@@ -166,59 +157,47 @@ Next steps:
       }
     } else {
       let content = fs.readFileSync(src, "utf8");
-      content = content
-        .replace(/__PROJECT_NAME__/g, projectName)
-        .replace(/__DB_CHOICE__/g, database)
-        .replace(/__LANG__/g, language)
-        .replace(/__FRAMEWORK__/g, framework);
-      fs.writeFileSync(dest, content);
+      content = content.replace(/__PROJECT_NAME__/g, projectName);
+      content = content.replace(/__DB_CHOICE__/g, database);
+      content = content.replace(/__LANG__/g, language);
+      content = content.replace(/__FRAMEWORK__/g, framework);
+      fs.writeFileSync(dest, content, { mode: stat.mode });
     }
   }
 
   copyRecursive(templateDir, target);
   console.log(`Project "${projectName}" created at ${target}`);
 
-  run("npm", ["install"], target);
 
-  if (database === "PostgreSQL (Prisma)") {
-    run("npm", ["install", "prisma", "@prisma/client"], target);
-    run("npx", ["prisma", "init"], target);
-
-    const configPath = path.join(target, "prisma", "prisma.config.ts");
-    if (fs.existsSync(configPath)) fs.unlinkSync(configPath);
-
-    fs.writeFileSync(
-      path.join(target, "prisma", "schema.prisma"),
-      `
-datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
-}
-
-generator client {
-  provider = "prisma-client-js"
-}
-
-model User {
-  id    Int    @id @default(autoincrement())
-  email String @unique
-  name  String?
-}
-`.trim()
-    );
-  }
-
-  if (database === "MongoDB (Mongoose)") {
-    run("npm", ["install", "mongoose"], target);
-  }
+  console.log("Running npm install...");
+  spawnSync("npm", ["install"], { cwd: target, stdio: "inherit" });
 
 
   if (framework === "Fastify") {
-    run("npm", ["install", "fastify"], target);
+    spawnSync("npm", ["install", "fastify"], { cwd: target, stdio: "inherit" });
   }
 
   if (framework === "Hono") {
-    run("npm", ["install", "hono"], target);
+    spawnSync("npm", ["install", "hono"], { cwd: target, stdio: "inherit" });
+  }
+
+
+  if (database === "PostgreSQL (Prisma)") {
+    spawnSync("npm", ["install", "prisma", "@prisma/client"], {
+      cwd: target,
+      stdio: "inherit"
+    });
+    spawnSync("npx", ["prisma", "init"], {
+      cwd: target,
+      stdio: "inherit"
+    });
+  }
+
+  if (database === "MongoDB (Mongoose)") {
+    spawnSync("npm", ["install", "mongoose"], {
+      cwd: target,
+      stdio: "inherit"
+    });
   }
 
 
@@ -227,10 +206,12 @@ model User {
       path.join(target, "Dockerfile"),
       `
 FROM node:20
+
 WORKDIR /app
 COPY package*.json ./
 RUN npm install
 COPY . .
+
 EXPOSE 3000
 CMD ["npm", "run", "dev"]
 `.trim()
@@ -240,6 +221,7 @@ CMD ["npm", "run", "dev"]
       path.join(target, "docker-compose.yml"),
       `
 version: "3.8"
+
 services:
   app:
     build: .
@@ -254,7 +236,7 @@ services:
   }
 
   if (extras.includes("Prettier + ESLint")) {
-    run(
+    spawnSync(
       "npm",
       [
         "install",
@@ -262,9 +244,9 @@ services:
         "eslint",
         "prettier",
         "eslint-config-prettier",
-        "eslint-plugin-prettier",
+        "eslint-plugin-prettier"
       ],
-      target
+      { cwd: target, stdio: "inherit" }
     );
 
     fs.writeFileSync(
@@ -290,9 +272,15 @@ dist
       path.join(target, ".eslintrc.json"),
       `
 {
-  "env": { "node": true, "es2021": true },
+  "env": {
+    "node": true,
+    "es2021": true
+  },
   "extends": ["eslint:recommended", "plugin:prettier/recommended"],
-  "parserOptions": { "ecmaVersion": 2022, "sourceType": "module" },
+  "parserOptions": {
+    "ecmaVersion": 2022,
+    "sourceType": "module"
+  },
   "rules": {}
 }
 `.trim()
@@ -301,9 +289,9 @@ dist
 
 
   console.log(`
-✔ Selected Language: ${language}
-✔ Selected Framework: ${framework}
-✔ Selected Database: ${database}
+Selected Language: ${language}
+Selected Framework: ${framework}
+Selected Database: ${database}
 
 Next steps:
   cd ${projectName}
