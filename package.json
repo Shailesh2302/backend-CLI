@@ -21,6 +21,6 @@
   "author": "Your Name <you@example.com>",
   "license": "MIT",
   "dependencies": {
-    "inquirer": "^13.0.1"
+    "inquirer": "^8.2.4"
   }
 }
