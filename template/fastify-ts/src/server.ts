@@ -1,16 +1,10 @@
 import app from "./app.js";
 
+
+
 const port = Number(process.env.PORT) || 3000;
 
+app.listen({ port: Number(port) }).then(() => {
+  console.log(`🚀 Server running at http://localhost:${port}`);
+});
 
-const start = async () => {
-  try { 
-    await app.listen({ port });
-    console.log(`Server running at http://localhost:${port}`);
-  } catch (err) {
-    console.error(err);
-    process.exit(1);
-  }
-};
-
-start();
