@@ -1,4 +1,3 @@
-#!/usr/bin/env node
 
 const figlet = require("figlet");
 const chalk = require("chalk");
@@ -60,28 +59,25 @@ function exitWith(msg, code = 1) {
   }
 
   const { language, framework, database, extras } = await askQuestions();
-
   const target = path.join(process.cwd(), projectName);
+
   if (fs.existsSync(target)) {
-    exitWith(`Error: "${projectName}" already exists at ${target}`);
+    exitWith(`Error: "${projectName}" already exists.`);
   }
 
   if (framework === "NestJS") {
-    console.log("Installing NestJS CLI...");
     spawnSync("npm", ["install", "-g", "@nestjs/cli"], { stdio: "inherit" });
-
-    console.log("Creating NestJS project...");
     spawnSync("nest", ["new", projectName, "--skip-git"], { stdio: "inherit" });
 
-    const nestProjectPath = target;
+    const nestPath = target;
 
     if (database === "PostgreSQL (Prisma)") {
       spawnSync("npm", ["install", "prisma", "@prisma/client"], {
-        cwd: nestProjectPath,
+        cwd: nestPath,
         stdio: "inherit"
       });
 
-      const prismaDir = path.join(nestProjectPath, "prisma");
+      const prismaDir = path.join(nestPath, "prisma");
       if (!fs.existsSync(prismaDir)) fs.mkdirSync(prismaDir);
 
       fs.writeFileSync(
@@ -105,21 +101,21 @@ model User {
       );
 
       fs.writeFileSync(
-        path.join(nestProjectPath, ".env"),
+        path.join(nestPath, ".env"),
         `DATABASE_URL="postgresql://user:password@localhost:5432/mydb"`
       );
     }
 
     if (database === "MongoDB (Mongoose)") {
       spawnSync("npm", ["install", "@nestjs/mongoose", "mongoose"], {
-        cwd: nestProjectPath,
+        cwd: nestPath,
         stdio: "inherit"
       });
     }
 
     if (extras.includes("Docker Support")) {
       fs.writeFileSync(
-        path.join(nestProjectPath, "Dockerfile"),
+        path.join(nestPath, "Dockerfile"),
         `
 FROM node:20
 WORKDIR /app
@@ -132,7 +128,7 @@ CMD ["npm", "run", "start:dev"]
       );
 
       fs.writeFileSync(
-        path.join(nestProjectPath, "docker-compose.yml"),
+        path.join(nestPath, "docker-compose.yml"),
         `
 version: "3.8"
 services:
@@ -149,11 +145,7 @@ services:
     }
 
     console.log("\nProject created successfully!");
-    console.log(`
-Next steps:
-  cd ${projectName}
-  npm run start:dev
-`);
+    console.log(`\nNext steps:\n  cd ${projectName}\n  npm run start:dev\n`);
     process.exit(0);
   }
 
@@ -176,6 +168,7 @@ Next steps:
         .replace(/__DB_CHOICE__/g, database)
         .replace(/__LANG__/g, language)
         .replace(/__FRAMEWORK__/g, framework);
+
       fs.writeFileSync(dest, content, { mode: stat.mode });
     }
   }
@@ -193,8 +186,11 @@ Next steps:
 
   fs.writeFileSync(pkgPath, JSON.stringify(pkg, null, 2));
 
-  console.log("Running npm install...");
   spawnSync("npm", ["install"], { cwd: target, stdio: "inherit" });
+
+  try {
+    spawnSync("chmod", ["-R", "+x", path.join(target, "node_modules/.bin")]);
+  } catch {}
 
   if (framework === "Fastify") {
     spawnSync("npm", ["install", "fastify"], { cwd: target, stdio: "inherit" });
@@ -235,10 +231,7 @@ model User {
   }
 
   if (database === "MongoDB (Mongoose)") {
-    spawnSync("npm", ["install", "mongoose"], {
-      cwd: target,
-      stdio: "inherit"
-    });
+    spawnSync("npm", ["install", "mongoose"], { cwd: target, stdio: "inherit" });
   }
 
   if (extras.includes("Docker Support")) {
@@ -288,36 +281,21 @@ services:
 
     fs.writeFileSync(
       path.join(target, ".prettierrc"),
-      `
-{
-  "singleQuote": true,
-  "semi": true,
-  "tabWidth": 2
-}
-`.trim()
+      `{"singleQuote": true, "semi": true, "tabWidth": 2}`
     );
 
     fs.writeFileSync(
       path.join(target, ".eslintignore"),
-      `
-node_modules
-dist
-`.trim()
+      `node_modules\ndist`
     );
 
     fs.writeFileSync(
       path.join(target, ".eslintrc.json"),
       `
 {
-  "env": {
-    "node": true,
-    "es2021": true
-  },
+  "env": { "node": true, "es2021": true },
   "extends": ["eslint:recommended", "plugin:prettier/recommended"],
-  "parserOptions": {
-    "ecmaVersion": 2022,
-    "sourceType": "module"
-  },
+  "parserOptions": { "ecmaVersion": 2022, "sourceType": "module" },
   "rules": {}
 }
 `.trim()

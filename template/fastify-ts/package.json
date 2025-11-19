@@ -9,11 +9,13 @@
   },
   "dependencies": {
     "fastify": "^4.25.2",
-    "fastify-plugin": "^5.0.0"
+    "fastify-plugin": "^5.0.0",
+    "@prisma/client": "^5.17.0"
   },
   "devDependencies": {
     "@types/node": "^20.19.25",
     "ts-node-dev": "^2.0.0",
-    "typescript": "^5.3.3"
+    "typescript": "^5.3.3",
+    "prisma": "^5.17.0"
   }
 }
