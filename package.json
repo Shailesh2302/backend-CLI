@@ -3,7 +3,7 @@
   "version": "1.0.18",
   "description": "Project generator: Express + TypeScript backend scaffold",
   "bin": {
-    "node-backend": "./index.js"
+    "node-backend": "index.js"
   },
   "files": [
     "index.js",
@@ -17,10 +17,10 @@
     "generator",
     "express",
     "typescript",
-    "scaffold",
-    "backend"
+    "backend",
+    "scaffold"
   ],
-  "author": "Your Name <you@example.com>",
+  "author": "Shailesh",
   "license": "MIT",
   "dependencies": {
     "chalk": "^4.1.2",
