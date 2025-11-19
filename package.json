@@ -3,7 +3,7 @@
   "version": "1.0.13",
   "description": "Project generator: Express + TypeScript backend scaffold",
   "bin": {
-    "node-backend": "index.js"
+    "node-backend": "./index.js"
   },
   "files": [
     "template"
