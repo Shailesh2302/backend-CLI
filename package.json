@@ -6,6 +6,7 @@
     "node-backend": "./index.js"
   },
   "files": [
+    "index.js",
     "template"
   ],
   "scripts": {
@@ -16,7 +17,8 @@
     "generator",
     "express",
     "typescript",
-    "scaffold"
+    "scaffold",
+    "backend"
   ],
   "author": "Your Name <you@example.com>",
   "license": "MIT",
