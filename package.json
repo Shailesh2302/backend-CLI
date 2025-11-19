@@ -1,6 +1,6 @@
 {
   "name": "@rush18/node-backend",
-  "version": "1.0.18",
+  "version": "1.0.19",
   "description": "Project generator: Express + TypeScript backend scaffold",
   "bin": {
     "node-backend": "index.js"
