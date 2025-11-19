@@ -3,7 +3,7 @@ import morgan from "morgan";
 import cookieParser from "cookie-parser";
 import createError from "http-errors";
 
-import router from "./routes/index.js";
+import router from "./routes/index";
 
 const app = express();
 
