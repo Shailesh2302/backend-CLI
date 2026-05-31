@@ -1,10 +1,12 @@
-# 🚀 Node Backend CLI
+# Node Backend CLI
 
-A modern, flexible, open-source backend project generator. Create full backend applications in **seconds**, powered by your choice of **Express**, **Fastify**, **Hono**, or **NestJS**.
+A modern, flexible, open-source backend project generator. Create full backend applications in seconds, powered by your choice of **Express**, **Fastify**, **Hono**, or **NestJS**.
+
+⭐ [Star on GitHub](https://github.com/Shailesh2302/backend-CLI)
 
 ---
 
-## 📦 Create a Project
+## Quick Start
 
 ```bash
 npx @rush18/node-backend my-app
@@ -12,52 +14,80 @@ npx @rush18/node-backend my-app
 
 You will be prompted to choose:
 
-* Language → TypeScript / JavaScript
-* Framework → Express / Fastify / Hono / NestJS
-* Database → Prisma / Mongoose / None
-* Extras → Docker Support / Prettier + ESLint
+- **Language** → TypeScript / JavaScript
+- **Module System** → ESM (import/export) / CommonJS (require/module.exports)
+- **Template Style** → Full (modern) / Simple (classic)
+- **Framework** → Express / Fastify / Hono / NestJS
+- **Database** → PostgreSQL (Prisma) / MongoDB (Mongoose) / None
+- **Extras** → Docker Support / Prettier + ESLint / Testing (Vitest)
+
+### Skip prompts
+
+```bash
+npx @rush18/node-backend my-app --yes
+```
+
+Use `--install` or `-i` to auto-install dependencies:
+
+```bash
+npx @rush18/node-backend my-app --install
+```
 
 ---
 
-## 📁 Project Structure
+## Template Styles
+
+### Full (recommended)
+
+Modern architecture with config, middleware, utilities, types, and health check:
+
+```
+my-app/
+ ├── src/
+ │   ├── config/           → Environment configuration (dotenv)
+ │   ├── middleware/        → Error handler, 404 handler
+ │   ├── routes/
+ │   │   ├── index.ts      → Route mounting
+ │   │   └── health.ts     → GET /health endpoint
+ │   ├── utils/            → Response helpers (success/error)
+ │   ├── types/            → Shared TypeScript types
+ │   ├── app.(ts|js)       → App setup (CORS, middleware, routes)
+ │   └── server.(ts|js)    → Server entry
+ ├── .env.example
+ ├── .gitignore
+ └── package.json
+```
+
+### Simple
+
+Minimal classic structure with just the essentials:
 
 ```
 my-app/
  ├── src/
  │   ├── routes/
- │   ├── controllers/
- │   ├── middleware/
- │   ├── config/
  │   ├── app.(ts|js)
  │   └── server.(ts|js)
- ├── package.json
- ├── tsconfig.json
- ├── Dockerfile
- ├── docker-compose.yml
- ├── .prettierrc
- ├── .eslintrc.json
- ├── .eslintignore
- └── README.md
+ ├── .gitignore
+ └── package.json
 ```
 
 ---
 
-## 🛠 Built With
+## Extras
 
-* Node.js
-* Express / Fastify / Hono / NestJS
-* Prisma / Mongoose
-* TypeScript / JavaScript (ESM)
-* Docker
-* ESLint + Prettier
+| Feature | Description |
+|---|---|
+| **Docker Support** | Generates `Dockerfile` + `docker-compose.yml` with health checks |
+| **Prettier + ESLint** | Linting and formatting setup with `lint` script |
+| **Testing (Vitest)** | Vitest config + sample test + `test` / `test:watch` scripts |
 
 ---
 
-## ▶️ Run the Project
+## Run the Project
 
 ```bash
 cd my-app
-npm install
 npm run dev
 ```
 
@@ -67,32 +97,13 @@ For NestJS:
 npm run start:dev
 ```
 
----
-
-## 🐳 Docker Support
-
-If selected, the CLI generates:
-
-* `Dockerfile`
-* `docker-compose.yml`
-
-Run:
+### Tests (if selected)
 
 ```bash
-docker compose up --build
+npm test
 ```
 
----
-
-## ✨ ESLint + Prettier
-
-If enabled, you get:
-
-* `.eslintrc.json`
-* `.prettierrc`
-* `.eslintignore`
-
-Run lint:
+### Lint (if selected)
 
 ```bash
 npm run lint
@@ -100,38 +111,20 @@ npm run lint
 
 ---
 
-## 📤 Deployment
-
-### Node
+## Docker
 
 ```bash
-npm run build
-npm start
+docker compose up --build
 ```
 
-### Docker
-
-```bash
-docker compose up -d
-```
+Generated Docker files include a health check against `/health`.
 
 ---
 
-## 🧭 Roadmap
+## License
 
-* Auth templates
-* CRUD module generator
-* Swagger/OpenAPI generation
-* Plugin system
+MIT © 2024 [@rush18](https://github.com/Shailesh2302)
 
 ---
 
-## 📝 License
-
-MIT © 2024 @rush18
-
----
-
-## ⭐ Support
-
-If you find this project useful, please give it a **star** ⭐ on GitHub!
+⭐ If you find this project useful, please [star it on GitHub](https://github.com/Shailesh2302/backend-CLI)!

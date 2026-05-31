@@ -9,9 +9,7 @@
     "index.js",
     "template"
   ],
-  "scripts": {
-    "test": "node ./test/run-test.js"
-  },
+  "scripts": {},
   "keywords": [
     "create",
     "generator",

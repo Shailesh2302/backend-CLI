@@ -1,11 +1,10 @@
 import app from "./app.js";
-
-const port = process.env.PORT || 3000;
+import { config } from "./config/index.js";
 
 const start = async () => {
   try {
-    await app.listen({ port });
-    console.log(`Server running at http://localhost:${port}`);
+    await app.listen({ port: config.port, host: "0.0.0.0" });
+    console.log(`Server running at http://localhost:${config.port}`);
   } catch (err) {
     console.error(err);
     process.exit(1);
